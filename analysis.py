@@ -93,12 +93,11 @@ def grouper(iterable, n, fillvalue=None):
 def difference_poincare_movie(west, north, order=1, name="", points_per_frame=100):
     #add in the things frame by frame
     total_max = max([max(west), max(north)])
-    print total_max
     plt.clf()
     plt.close("all")
-    plt.axis([0, total_max, 0, total_max])
 
     fig, ax = plt.subplots()
+    ax.axis([0, total_max, 0, total_max])
     ax.set_autoscale_on(False)
     #set the damned axes
     plt.xlabel("unlagged")
@@ -119,7 +118,8 @@ def difference_poincare_movie(west, north, order=1, name="", points_per_frame=10
         print len(group)
         xs = map(operator.itemgetter(0), group)
         ys = map(operator.itemgetter(1), group)
-        ax.scatter(xs, ys)
+        ax.scatter(xs, ys, alpha=0.3)
+        ax.axis([0, total_max, 0, total_max])
         plt.savefig("./difference_poincare_movies/" + name + ("_%02d" % (curr_plot,)))
         curr_plot += 1
 
