@@ -90,21 +90,38 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.izip_longest(fillvalue=fillvalue, *args)
 
-def poincare_movies(data, order=1, name="", points_per_frame=100):
+def difference_poincare_movie(west, north, order=1, name="", points_per_frame=100):
     #add in the things frame by frame
+    total_max = max([max(west), max(north)])
+    print total_max
     plt.clf()
+    plt.close("all")
+    plt.axis([0, total_max, 0, total_max])
 
     fig, ax = plt.subplots()
+    ax.set_autoscale_on(False)
+    #set the damned axes
     plt.xlabel("unlagged")
     plt.ylabel("lagged")
     plt.title(name)
 
-    unlagged = data[:-order]
-    lagged = np.roll(data, -order)[:-order]
-    to_plot = zip(unlagged, lagged)
+    west = np.array(west)
+    north = np.array(north)
+    dts = (west - north)
+
+    unlagged_dts = dts[:-order]
+    lagged_dts = np.roll(dts, -order)[:-order]
+    to_plot = zip(unlagged_dts, lagged_dts)
+    print len(to_plot)
+    curr_plot = 0
     for group in grouper(to_plot, points_per_frame):
-        print group
-        #plt.show()
+        group = filter(lambda x: x, group)
+        print len(group)
+        xs = map(operator.itemgetter(0), group)
+        ys = map(operator.itemgetter(1), group)
+        ax.scatter(xs, ys)
+        plt.savefig("./difference_poincare_movies/" + name + ("_%02d" % (curr_plot,)))
+        curr_plot += 1
 
 #returns projection of vector u onto the line defined by vector v
 def proj(u, v):
@@ -310,20 +327,15 @@ row_dict = {
         17: "Legs"
         }
 
-def processed_glob_series(part_reader):
+def processed_glob_series(part_reader, curr_fname):
     part_reader.next() #header
     west = []
     north = []
     for row in part_reader:
         west.append(process_num(row[1]))
         north.append(process_num(row[2]))
-    #difference_poincare(west, north, curr_fname)
-    integ = sorted(check_l2_integrability(west), reverse=True)
-    #cutoff because of fat tail, try to look for more data
-    integ = integ[:500]
-    print len(integ)
-    #normal_plot(integ, "integrability", loglog=True)
-    poincare_plot(series)
+    #difference_poincare_ellipse(west, north, name=curr_fname)
+    difference_poincare_movie(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
@@ -341,17 +353,17 @@ def unprocessed_glob_series(part_reader, curr_fname):
         row_n = process_row(rows[row_idx + 19])
     #poincare_movies(first_row)
         row_fname = curr_fname + ("_row_%02d" % (row_idx,))
-        difference_poincare_ellipse(row_w, row_n, name=row_fname)
+        #difference_poincare_ellipse(row_w, row_n, name=row_fname)
 
 if __name__ == "__main__":
     ##### normalize all axes!!!!
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
-    unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
-    globs = unprocessed_globs #take this out when necessary
+    #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
+    globs = processed_globs #take this out when necessary
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
         print curr_fname
         with open(curr_path, "rU") as part_file:
             part_reader = csv.reader(part_file)
-            unprocessed_glob_series(part_reader, curr_fname)
+            processed_glob_series(part_reader, curr_fname)
