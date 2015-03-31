@@ -86,43 +86,6 @@ def poincare_plot(data, order=1, name="", line=False, sds=False):
     plt.title(name)
     plt.show()
 
-def grouper(iterable, n, fillvalue=None):
-    args = [iter(iterable)] * n
-    return itertools.izip_longest(fillvalue=fillvalue, *args)
-
-def difference_poincare_movie(west, north, order=1, name="", points_per_frame=100):
-    #add in the things frame by frame
-    total_max = max([max(west), max(north)])
-    plt.clf()
-    plt.close("all")
-
-    fig, ax = plt.subplots()
-    ax.axis([0, total_max, 0, total_max])
-    ax.set_autoscale_on(False)
-    #set the damned axes
-    plt.xlabel("unlagged")
-    plt.ylabel("lagged")
-    plt.title(name)
-
-    west = np.array(west)
-    north = np.array(north)
-    dts = (west - north)
-
-    unlagged_dts = dts[:-order]
-    lagged_dts = np.roll(dts, -order)[:-order]
-    to_plot = zip(unlagged_dts, lagged_dts)
-    print len(to_plot)
-    curr_plot = 0
-    for group in grouper(to_plot, points_per_frame):
-        group = filter(lambda x: x, group)
-        print len(group)
-        xs = map(operator.itemgetter(0), group)
-        ys = map(operator.itemgetter(1), group)
-        ax.scatter(xs, ys, alpha=0.3)
-        ax.axis([0, total_max, 0, total_max])
-        plt.savefig("./difference_poincare_movies/" + name + ("_%02d" % (curr_plot,)))
-        curr_plot += 1
-
 #returns projection of vector u onto the line defined by vector v
 def proj(u, v):
     temp = np.dot(u,v) / np.dot(v,v)
@@ -229,11 +192,66 @@ def difference_poincare_ellipse(west, north, name, order=1):
     with open("./difference_poincares_ellipse/" + name + "_stats", "w") as stats_file:
         stats_file.write("mean:%f\nstd1:%f\nstd1:%f" % (data_mean, sd1, sd2))
 
-def correlation_over_time(west, north, name, order=1, num_points=100):
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return itertools.izip_longest(fillvalue=fillvalue, *args)
+
+def difference_poincare_movie(west, north, order=1, name="", points_per_frame=100):
+    #add in the things frame by frame
+    total_max = max([max(west), max(north)])
     plt.clf()
     plt.close("all")
-    #remember the cornetto, take the sections of the cornetto
-    pass
+
+    fig, ax = plt.subplots()
+    ax.axis([0, total_max, 0, total_max])
+    ax.set_autoscale_on(False)
+    #set the damned axes
+    plt.xlabel("unlagged")
+    plt.ylabel("lagged")
+    plt.title(name)
+
+    west = np.array(west)
+    north = np.array(north)
+    dts = (west - north)
+
+    unlagged_dts = dts[:-order]
+    lagged_dts = np.roll(dts, -order)[:-order]
+    to_plot = zip(unlagged_dts, lagged_dts)
+    print len(to_plot)
+    curr_plot = 0
+    for group in grouper(to_plot, points_per_frame):
+        group = filter(lambda x: x, group)
+        print len(group)
+        xs = map(operator.itemgetter(0), group)
+        ys = map(operator.itemgetter(1), group)
+        ax.scatter(xs, ys, alpha=0.3)
+        ax.axis([0, total_max, 0, total_max])
+        plt.savefig("./difference_poincare_movies/" + name + ("_%02d" % (curr_plot,)))
+        curr_plot += 1
+
+
+def correlation_over_time(west, north, name, order=1, points_per_frame=100):
+    plt.clf()
+    plt.close("all")
+    wmin, wmax, nmin, nmax = min(west), max(west), min(north), max(north)
+    fig, ax = plt.subplots()
+    ax.axis([wmin, wmax, nmin, nmax])
+    ax.set_autoscale_on(False)
+    plt.xlabel("west")
+    plt.ylabel("north")
+    plt.title(name)
+    west = np.array(west)
+    north = np.array(north)
+    to_plot = zip(west, north)
+    curr_plot = 0
+    for group in grouper(to_plot, points_per_frame):
+        group = filter(lambda x: x, group)
+        xs = map(operator.itemgetter(0), group)
+        ys = map(operator.itemgetter(1), group)
+        ax.scatter(xs, ys, alpha=0.3)
+        ax.axis([wmin, wmax, nmin, nmax])
+        plt.savefig("./correlation_movies/" + name + ("_%02d" % (curr_plot,)))
+        curr_plot += 1
 
 def recurrence_plot(data):
     num_pts = data.size
