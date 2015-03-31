@@ -229,6 +229,12 @@ def difference_poincare_ellipse(west, north, name, order=1):
     with open("./difference_poincares_ellipse/" + name + "_stats", "w") as stats_file:
         stats_file.write("mean:%f\nstd1:%f\nstd1:%f" % (data_mean, sd1, sd2))
 
+def correlation_over_time(west, north, name, order=1, num_points=100):
+    plt.clf()
+    plt.close("all")
+    #remember the cornetto, take the sections of the cornetto
+    pass
+
 def recurrence_plot(data):
     num_pts = data.size
     ret_mat = np.zeros((num_pts, num_pts))
@@ -335,7 +341,8 @@ def processed_glob_series(part_reader, curr_fname):
         west.append(process_num(row[1]))
         north.append(process_num(row[2]))
     #difference_poincare_ellipse(west, north, name=curr_fname)
-    difference_poincare_movie(west, north, name=curr_fname)
+    #difference_poincare_movie(west, north, name=curr_fname)
+    correlation_over_time(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
