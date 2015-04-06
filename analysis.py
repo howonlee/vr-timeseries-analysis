@@ -248,10 +248,15 @@ def correlation_over_time(west, north, name, order=1, points_per_frame=100):
         group = filter(lambda x: x, group)
         xs = map(operator.itemgetter(0), group)
         ys = map(operator.itemgetter(1), group)
+        data_mean, sd1, sd2 = ellipse_sds(group)
+        ellipse = patches.Ellipse(xy=(data_mean, data_mean), width=(2*sd2), height=(2*sd1), angle=45, alpha=0.5, color="red")
+        ax.add_patch(ellipse)
         ax.scatter(xs, ys, alpha=0.3)
         ax.axis([wmin, wmax, nmin, nmax])
         plt.savefig("./correlation_movies/" + name + ("_%02d" % (curr_plot,)))
         curr_plot += 1
+        with open("./correlation_movies/" + name + "_%02d_stats" % (curr_plot,), "w") as stats_file:
+            stats_file.write("mean:%f\nstd1:%f\nstd1:%f" % (data_mean, sd1, sd2))
 
 def recurrence_plot(data):
     num_pts = data.size
