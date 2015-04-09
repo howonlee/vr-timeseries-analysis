@@ -424,8 +424,6 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    print auto_mutual_information([1,2,3,4,65,22,95,5,32,-1,3,5])
-    """
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
@@ -433,4 +431,3 @@ if __name__ == "__main__":
         with open(curr_path, "rU") as part_file:
             part_reader = csv.reader(part_file)
             processed_glob_series(part_reader, curr_fname)
-    """
