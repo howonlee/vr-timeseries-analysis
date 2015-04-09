@@ -304,18 +304,30 @@ def cross_mutual_information(data1, data2, stepsize=1):
         cmis.append(mutual_information(first, lagged))
     return cmis
 
+def discretize_data(data, bucket_size=0.1):
+    #depends upon the data!
+    pass
+
+def ami_plot(data, name):
+    pass
+
+def cmi_plot(west, north, name):
+    pass
 
 def arnold_tongue(data):
     pass
 
 def fractal_dimension(data):
+    #correlation dimension, we mean
     pass
 
 def lyapunov_exponent(data):
+    #this is not the bullshit with 15 points, but it's not the awesome stuff
+    #with 15000000 points, either
     pass
 
 def phase_space_embedding(data):
-    #logical prerequisite to the others
+    #logical prerequisite to the below
     pass
 
 def knn_fit(data):
