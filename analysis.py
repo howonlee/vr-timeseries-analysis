@@ -294,10 +294,15 @@ def mutual_information(data1, data2):
     return entropy(data1) + entropy(data2) - joint_entropy(data1, data2)
 
 def auto_mutual_information(data, stepsize=1):
-    pass
+    return cross_mutual_information(data, data, stepsize)
 
 def cross_mutual_information(data1, data2, stepsize=1):
-    pass
+    first = np.array(data1)
+    cmis = []
+    for lag in xrange(len(data2) // stepsize):
+        lagged = np.roll(data2, -lag)
+        cmis.append(mutual_information(first, lagged))
+    return cmis
 
 
 def arnold_tongue(data):
@@ -419,7 +424,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    print mutual_information([1,2,3,4,65,22,95,5,32,-1,3,5],[1,2,3,4,5,4,3,2,1,4,3,2])
+    print auto_mutual_information([1,2,3,4,65,22,95,5,32,-1,3,5])
     """
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
