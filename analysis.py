@@ -281,15 +281,13 @@ def entropy(data):
     return sum(-p * np.log2(p) for _, p in data_probs.iteritems())
 
 def joint_entropy(data1, data2):
-    def entropy_part(p):
-        if not p:
-            return 0
-        return -p * np.log2(p)
-    pairs = zip(data1, data2)
     probs = []
-    for pair in itertools.product(data1, data2):
-        probs.append(float(sum(p == pair for p in pairs)) / len(pairs))
-    return sum(map(entropy_part, probs))
+    data1, data2 = np.array(data1), np.array(data2)
+    for c1 in set(data1):
+        for c2 in set(data2):
+            probs.append(np.mean(np.logical_and(data1 == c1, data2 == c2)))
+    probs = filter(lambda x: x != 0.0, probs)
+    return np.sum(-p * np.log2(p) for p in probs)
 
 def mutual_information(data1, data2):
     data1, data2 = list(data1), list(data2)
@@ -421,7 +419,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    print mutual_information([1,2,3,4,65,3,2,5,32,4,3,5],[1,2,3,4,5,4,3,2,1,4,3,2])
+    print mutual_information([1,2,3,4,65,22,95,5,32,-1,3,5],[1,2,3,4,5,4,3,2,1,4,3,2])
     """
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
