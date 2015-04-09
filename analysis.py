@@ -277,8 +277,15 @@ def entropy(data):
         entropy -= prob_data[x] * log_prob_data[x]
     return entropy
 
-def join_entropy(data1, data2):
-    pass
+def joint_entropy(data1, data2):
+    data1, data2 = np.array(data1), np.array(data2)
+    prob_hist, x_edges, y_edges = np.histogram2d(data1, data2, normed=True)
+    prob_hist = prob_hist.ravel()[np.nonzero(prob_hist.ravel())]
+    log_prob_hist = np.log2(prob_hist)
+    entropy = 0
+    for x in xrange(prob_hist.shape[0]):
+        entropy -= prob_hist[x] * log_prob_hist[x]
+    return entropy
 
 
 def arnold_tongue(data):
@@ -403,6 +410,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
+    print joint_entropy([1,2,3,4,3,2,1], [2,3,4,5,6,4,3])
     """
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
