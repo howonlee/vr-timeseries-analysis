@@ -295,6 +295,12 @@ def mutual_information(data1, data2):
     data1, data2 = list(data1), list(data2)
     return entropy(data1) + entropy(data2) - joint_entropy(data1, data2)
 
+def auto_mutual_information(data, stepsize=1):
+    pass
+
+def cross_mutual_information(data1, data2, stepsize=1):
+    pass
+
 
 def arnold_tongue(data):
     pass
