@@ -267,18 +267,22 @@ def recurrence_plot(data):
     plt.matshow(ret_mat)
     plt.show()
 
+def prob_dict(data):
+    data = list(data)
+    alphabet = set(data)
+    probdict = {}
+    for symbol in alphabet:
+        ctr = sum(1 for x in data if x == symbol)
+        probdict[symbol] = (float(ctr) / len(data))
+    return probdict
+
 def entropy(data):
-    data = np.array(data)
-    prob_data, bin_edges = np.histogram(data, density=True)
-    prob_data = prob_data[np.nonzero(prob_data)]
-    log_prob_data = np.log2(prob_data)
-    entropy = 0
-    for x in xrange(prob_data.shape[0]):
-        entropy -= prob_data[x] * log_prob_data[x]
-    return entropy
+    data_probs = prob_dict(data)
+    return sum(-p * np.log2(p) for _, p in data_probs.iteritems())
 
 def joint_entropy(data1, data2):
-    data1, data2 = np.array(data1), np.array(data2)
+    data1, data2 = list(data1), list(data2)
+    freq1, freq2 = probdict(data1), probdict(data2)
     prob_hist, x_edges, y_edges = np.histogram2d(data1, data2, normed=True)
     prob_hist = prob_hist.ravel()[np.nonzero(prob_hist.ravel())]
     log_prob_hist = np.log2(prob_hist)
@@ -410,7 +414,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    print joint_entropy([1,2,3,4,3,2,1], [2,3,4,5,6,4,3])
+    print entropy([1,2,3,4,65,3,2,5,32,4,3,5])
     """
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
