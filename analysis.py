@@ -281,15 +281,19 @@ def entropy(data):
     return sum(-p * np.log2(p) for _, p in data_probs.iteritems())
 
 def joint_entropy(data1, data2):
+    def entropy_part(p):
+        if not p:
+            return 0
+        return -p * np.log2(p)
+    pairs = zip(data1, data2)
+    probs = []
+    for pair in itertools.product(data1, data2):
+        probs.append(float(sum(p == pair for p in pairs)) / len(pairs))
+    return sum(map(entropy_part, probs))
+
+def mutual_information(data1, data2):
     data1, data2 = list(data1), list(data2)
-    freq1, freq2 = probdict(data1), probdict(data2)
-    prob_hist, x_edges, y_edges = np.histogram2d(data1, data2, normed=True)
-    prob_hist = prob_hist.ravel()[np.nonzero(prob_hist.ravel())]
-    log_prob_hist = np.log2(prob_hist)
-    entropy = 0
-    for x in xrange(prob_hist.shape[0]):
-        entropy -= prob_hist[x] * log_prob_hist[x]
-    return entropy
+    return entropy(data1) + entropy(data2) - joint_entropy(data1, data2)
 
 
 def arnold_tongue(data):
@@ -309,9 +313,6 @@ def knn_fit(data):
     pass
 
 def neural_net_fit(data):
-    pass
-
-def mutual_information_plot(data):
     pass
 
 def lag_plot(data):
@@ -414,7 +415,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    print entropy([1,2,3,4,65,3,2,5,32,4,3,5])
+    print mutual_information([1,2,3,4,65,3,2,5,32,4,3,5],[1,2,3,4,5,4,3,2,1,4,3,2])
     """
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
