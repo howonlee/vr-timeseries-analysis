@@ -282,7 +282,8 @@ def entropy(data):
 
 def joint_entropy(data1, data2):
     probs = []
-    data1, data2 = np.array(data1), np.array(data2)
+    data1, data2 = np.array(data1, dtype=np.int16), np.array(data2, dtype=np.int16)
+    #should look at the sparsity of things
     for c1 in set(data1):
         for c2 in set(data2):
             probs.append(np.mean(np.logical_and(data1 == c1, data2 == c2)))
@@ -293,10 +294,10 @@ def mutual_information(data1, data2):
     data1, data2 = list(data1), list(data2)
     return entropy(data1) + entropy(data2) - joint_entropy(data1, data2)
 
-def auto_mutual_information(data, stepsize=1):
+def auto_mutual_information(data, stepsize):
     return cross_mutual_information(data, data, stepsize)
 
-def cross_mutual_information(data1, data2, stepsize=1):
+def cross_mutual_information(data1, data2, stepsize):
     first = np.array(data1)
     cmis = []
     for lag in xrange(len(data2) // stepsize):
@@ -309,12 +310,18 @@ def discretize_data(data, bucket_size=0.1):
     data_min, data_max = np.min(data), np.max(data)
     buckets = np.arange(data_min, data_max, bucket_size)
     idx = np.digitize(data, buckets)
-    return data[idx-1], idx
+    return buckets[idx-1], idx
 
-def ami_plot(data, name):
-    print discretize_data(data)
-
-    pass
+def ami_plot(data, name, stepsize=20):
+    digitized, idx = discretize_data(data)
+    autos = auto_mutual_information(idx, stepsize)
+    plt.clf()
+    plt.close()
+    plt.title(name)
+    plt.plot(range(0, stepsize*len(autos), stepsize), autos)
+    plt.xlabel("lag")
+    plt.ylabel("ami (bits)")
+    plt.savefig("./ami_plots/" + name)
 
 def cmi_plot(west, north, name):
     pass
@@ -442,6 +449,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
+    globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
