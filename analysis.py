@@ -323,8 +323,17 @@ def ami_plot(data, name, stepsize=20):
     plt.ylabel("ami (bits)")
     plt.savefig("./ami_plots/" + name)
 
-def cmi_plot(west, north, name):
-    pass
+def cmi_plot(west, north, name, stepsize=20):
+    _, idx_w = discretize_data(west)
+    _, idx_n = discretize_data(north)
+    autos = cross_mutual_information(idx_w, idx_n, stepsize)
+    plt.clf()
+    plt.close()
+    plt.title(name)
+    plt.plot(range(0, stepsize*len(autos), stepsize), autos)
+    plt.xlabel("lag")
+    plt.ylabel("cmi (bits)")
+    plt.savefig("./cmi_plots/" + name)
 
 def arnold_tongue(data):
     pass
