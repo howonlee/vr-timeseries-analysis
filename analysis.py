@@ -305,10 +305,13 @@ def cross_mutual_information(data1, data2, stepsize=1):
     return cmis
 
 def discretize_data(data, bucket_size=0.1):
+    data_min, data_max = np.min(data), np.max(data)
+    buckets = np.arange(data_min, data_max, bucket_size)
     #depends upon the data!
     pass
 
 def ami_plot(data, name):
+
     pass
 
 def cmi_plot(west, north, name):
