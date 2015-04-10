@@ -305,12 +305,14 @@ def cross_mutual_information(data1, data2, stepsize=1):
     return cmis
 
 def discretize_data(data, bucket_size=0.1):
+    data = np.array(data)
     data_min, data_max = np.min(data), np.max(data)
     buckets = np.arange(data_min, data_max, bucket_size)
-    #depends upon the data!
-    pass
+    idx = np.digitize(data, buckets)
+    return data[idx-1], idx
 
 def ami_plot(data, name):
+    print discretize_data(data)
 
     pass
 
@@ -414,7 +416,8 @@ def processed_glob_series(part_reader, curr_fname):
         north.append(process_num(row[2]))
     #difference_poincare_ellipse(west, north, name=curr_fname)
     #difference_poincare_movie(west, north, name=curr_fname)
-    correlation_over_time(west, north, name=curr_fname)
+    #correlation_over_time(west, north, name=curr_fname)
+    ami_plot(west, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
