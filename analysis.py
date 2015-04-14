@@ -294,13 +294,13 @@ def mutual_information(data1, data2):
     data1, data2 = list(data1), list(data2)
     return entropy(data1) + entropy(data2) - joint_entropy(data1, data2)
 
-def auto_mutual_information(data, stepsize):
-    return cross_mutual_information(data, data, stepsize)
+def auto_mutual_information(data, stepsize, stepmax):
+    return cross_mutual_information(data, data, stepsize, stepmax)
 
-def cross_mutual_information(data1, data2, stepsize):
+def cross_mutual_information(data1, data2, stepsize, stepmax):
     first = np.array(data1)
     cmis = []
-    for lag in xrange(len(data2) // stepsize):
+    for lag in xrange(0, stepmax, stepsize):
         lagged = np.roll(data2, -lag)
         cmis.append(mutual_information(first, lagged))
     return cmis
@@ -312,29 +312,29 @@ def discretize_data(data, bucket_size=0.2):
     idx = np.digitize(data, buckets)
     return buckets[idx-1], idx
 
-def ami_plot(data, name, stepsize=50, max_bits=10):
+def ami_plot(data, name, stepsize=1, max_bits=10, stepmax=50):
     digitized, idx = discretize_data(data)
-    autos = auto_mutual_information(idx, stepsize)
-    xmin, xmax, ymin, ymax = 0, len(data), 0, max_bits
+    autos = auto_mutual_information(idx, stepsize, stepmax)
+    xmin, xmax, ymin, ymax = 0, stepmax, 0, max_bits
     plt.clf()
     plt.close()
     fig, ax = plt.subplots()
     ax.axis([xmin, xmax, ymin, ymax])
     plt.title(name)
-    ax.plot(range(0, stepsize*len(autos), stepsize), autos)
+    ax.plot(range(0, stepmax, stepsize), autos)
     #ranges
     plt.xlabel("lag")
     plt.ylabel("ami (bits)")
     plt.savefig("./ami_plots/" + name)
 
-def cmi_plot(west, north, name, stepsize=50):
+def cmi_plot(west, north, name, stepsize=1, stepmax=50):
     _, idx_w = discretize_data(west)
     _, idx_n = discretize_data(north)
-    autos = cross_mutual_information(idx_w, idx_n, stepsize)
+    autos = cross_mutual_information(idx_w, idx_n, stepsize, stepmax)
     plt.clf()
     plt.close()
     plt.title(name)
-    plt.plot(range(0, stepsize*len(autos), stepsize), autos)
+    plt.plot(range(0, stepmax, stepsize), autos)
     plt.xlabel("lag")
     plt.ylabel("cmi (bits)")
     plt.savefig("./cmi_plots/" + name)
@@ -437,10 +437,7 @@ def processed_glob_series(part_reader, curr_fname):
     #difference_poincare_ellipse(west, north, name=curr_fname)
     #difference_poincare_movie(west, north, name=curr_fname)
     #correlation_over_time(west, north, name=curr_fname)
-    try:
-        cmi_plot(west, north, name=curr_fname)
-    except:
-        print "error on %s" % (curr_fname,)
+    ami_plot(west, name=curr_fname)
     #cmi_plot(west, north, name=curr_fname)
 
 def filter_nan(member):
@@ -466,7 +463,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    #globs = [globs[0]]
+    globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
