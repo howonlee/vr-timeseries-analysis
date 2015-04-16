@@ -331,7 +331,9 @@ def initial_mi_vals(west, north, name):
     _, idx_w = discretize_data(west)
     _, idx_n = discretize_data(north)
     mis = cross_mutual_information(idx_w, idx_n, 1, 1)
-    print mis
+    mi_string = "%s,%s\n" % (name, str(mis[0]))
+    with open("initial_cmis.csv", "a") as initial_cmi:
+        initial_cmi.write(mi_string)
 
 def cmi_plot(west, north, name, stepsize=1, stepmax=50):
     _, idx_w = discretize_data(west)
