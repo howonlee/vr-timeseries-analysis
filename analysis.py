@@ -86,7 +86,7 @@ def poincare_plot(data, order=1, name="", line=False, sds=False):
     plt.title(name)
     plt.show()
 
-#returns projection of vector u onto the line defined by vector v
+#returns pkrojection of vector u onto the line defined by vector v
 def proj(u, v):
     temp = np.dot(u,v) / np.dot(v,v)
     return temp * v
@@ -308,7 +308,7 @@ def cross_mutual_information(data1, data2, stepsize, stepmax):
 def discretize_data(data, bucket_size=0.2):
     data = np.array(data)
     data_min, data_max = np.min(data), np.max(data)
-    buckets = np.arange(data_min, data_max, bucket_size)
+    buckets = np.linspace(data_min, data_max, num=64)
     idx = np.digitize(data, buckets)
     return buckets[idx-1], idx
 
@@ -327,14 +327,20 @@ def ami_plot(data, name, stepsize=1, max_bits=10, stepmax=50):
     plt.ylabel("ami (bits)")
     plt.savefig("./ami_plots/" + name)
 
+def initial_mi_vals(west, north, name):
+    _, idx_w = discretize_data(west)
+    _, idx_n = discretize_data(north)
+    mis = cross_mutual_information(idx_w, idx_n, 1, 1)
+    print mis
+
 def cmi_plot(west, north, name, stepsize=1, stepmax=50):
     _, idx_w = discretize_data(west)
     _, idx_n = discretize_data(north)
-    autos = cross_mutual_information(idx_w, idx_n, stepsize, stepmax)
+    mis = cross_mutual_information(idx_w, idx_n, stepsize, stepmax)
     plt.clf()
     plt.close()
     plt.title(name)
-    plt.plot(range(0, stepmax, stepsize), autos)
+    plt.plot(range(0, stepmax, stepsize), mis)
     plt.xlabel("lag")
     plt.ylabel("cmi (bits)")
     plt.savefig("./cmi_plots/" + name)
@@ -437,8 +443,8 @@ def processed_glob_series(part_reader, curr_fname):
     #difference_poincare_ellipse(west, north, name=curr_fname)
     #difference_poincare_movie(west, north, name=curr_fname)
     #correlation_over_time(west, north, name=curr_fname)
-    ami_plot(west, name=curr_fname)
-    #cmi_plot(west, north, name=curr_fname)
+    #ami_plot(west, name=curr_fname)
+    initial_mi_vals(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
@@ -463,7 +469,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    globs = [globs[0]]
+    #globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
