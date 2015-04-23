@@ -37,4 +37,5 @@ def main():
     #print mean_phase_coherence(hilbert_phase(w), hilbert_phase(n))
 
 if __name__ == "__main__":
+    #gotta do a good bandpass filter first
     main()
