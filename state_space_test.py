@@ -8,6 +8,7 @@ def lorenz_deriv(vec,t0,sigma=10., beta=8./3, rho=28.0):
 #call it a time series in 1-space
 #bam, taken's embedding
 #check rightness of embedding
+#defs need to get the actual dimension, too
 
 #then, we can calculate M(x|y), which is not a trivial task
 
