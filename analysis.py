@@ -12,6 +12,7 @@ import numpy.linalg as np_l
 import numpy as np
 import pandas as pd
 import pandas.tools.plotting as pd_plot
+import scipy.signal as sci_sig
 
 def fourier_plot(data):
     plt.clf()
@@ -336,52 +337,43 @@ def initial_mi_vals(west, north, name):
         initial_cmi.write(mi_string)
 
 def cmi_plot(west, north, name, stepsize=1, stepmax=50):
+    max_bits = 10 #define here because it's easy
     _, idx_w = discretize_data(west)
     _, idx_n = discretize_data(north)
     mis = cross_mutual_information(idx_w, idx_n, stepsize, stepmax)
+    xmin, xmax, ymin, ymax = 0, stepmax, 0, max_bits
     plt.clf()
     plt.close()
+    fig, ax = plt.subplots()
+    ax.axis([xmin, xmax, ymin, ymax])
+    ax.plot(range(0, stepmax, stepsize), mis)
     plt.title(name)
-    plt.plot(range(0, stepmax, stepsize), mis)
     plt.xlabel("lag")
     plt.ylabel("cmi (bits)")
     plt.savefig("./cmi_plots/" + name)
 
-def arnold_tongue(data):
+def hilbert_phase(transformed):
+    hilbert_real, hilbert_imag = np.real(transformed), np.imag(transformed)
+    return np.arctan2(hilbert_imag, hilbert_real)
+
+def hilbert_transform_phase_diff(west, north, name):
+    hilbert_w_phase = hilbert_phase(sci_sig.hilbert(west))
+    hilbert_n_phase = hilbert_phase(sci_sig.hilbert(north))
+    diff = hilbert_w_phase - hilbert_n_phase
+    plt.title(name)
+    plt.xlabel("time")
+    plt.plot(diff)
+    plt.ylabel("phase diff(w - n)")
+    plt.savefig("./phase_diff/" + name)
+
+def hilbert_phase_coherence(west, north, name):
+    #calculate the index of synchronization
+    hilbert_w_phase = hilbert_phase(sci_sig.hilbert(west))
+    hilbert_n_phase = hilbert_phase(sci_sig.hilbert(north))
+    #circular variance of angular distribution
     pass
 
-def fractal_dimension(data):
-    #correlation dimension, we mean
-    pass
-
-def lyapunov_exponent(data):
-    #this is not the bullshit with 15 points, but it's not the awesome stuff
-    #with 15000000 points, either
-    pass
-
-def phase_space_embedding(data):
-    #logical prerequisite to the below
-    pass
-
-def knn_fit(data):
-    pass
-
-def neural_net_fit(data):
-    pass
-
-def lag_plot(data):
-    """
-    minimum of autocorrelation heuristic says:
-    34
-    actually, we should use the mi for this in actuality
-    """
-    tau = 34
-    unlagged = data[:-tau]
-    lagged = np.roll(data, -tau)[:-tau]
-    plt.figure()
-    plt.plot(unlagged, "b")
-    plt.plot(lagged, "g")
-    plt.show()
+## phase space methods as needed
 
 def process_num(num_str):
     if num_str == "NA":
@@ -445,8 +437,10 @@ def processed_glob_series(part_reader, curr_fname):
     #difference_poincare_ellipse(west, north, name=curr_fname)
     #difference_poincare_movie(west, north, name=curr_fname)
     #correlation_over_time(west, north, name=curr_fname)
-    #ami_plot(west, name=curr_fname)
-    initial_mi_vals(west, north, name=curr_fname)
+    ami_plot(west, name=curr_fname)
+    ami_plot(north, name=curr_fname)
+    cmi_plot(west, north, name=curr_fname)
+    #initial_mi_vals(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
