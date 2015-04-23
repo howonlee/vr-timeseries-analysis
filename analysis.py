@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import pandas.tools.plotting as pd_plot
 import scipy.signal as sci_sig
+from hilbert_test import * #pollute that namespace woo
 
 def fourier_plot(data):
     plt.clf()
@@ -352,28 +353,6 @@ def cmi_plot(west, north, name, stepsize=1, stepmax=50):
     plt.xlabel("lag")
     plt.ylabel("cmi (bits)")
     plt.savefig("./cmi_plots/" + name)
-
-def hilbert_phase(transformed):
-    hilbert_real, hilbert_imag = np.real(transformed), np.imag(transformed)
-    return np.arctan2(hilbert_imag, hilbert_real)
-
-def hilbert_transform_phase_diff(west, north, name):
-    hilbert_w_phase = hilbert_phase(sci_sig.hilbert(west))
-    hilbert_n_phase = hilbert_phase(sci_sig.hilbert(north))
-    diff = hilbert_w_phase - hilbert_n_phase
-    plt.title(name)
-    plt.xlabel("time")
-    plt.plot(diff)
-    plt.ylabel("phase diff(w - n)")
-    plt.savefig("./phase_diff/" + name)
-
-def hilbert_phase_coherence(west, north, name):
-    #calculate the index of synchronization
-    hilbert_w_phase = hilbert_phase(sci_sig.hilbert(west))
-    hilbert_n_phase = hilbert_phase(sci_sig.hilbert(north))
-    #circular variance of angular distribution
-    pass
-
 ## phase space methods as needed
 
 def process_num(num_str):
@@ -438,10 +417,12 @@ def processed_glob_series(part_reader, curr_fname):
     #difference_poincare_ellipse(west, north, name=curr_fname)
     #difference_poincare_movie(west, north, name=curr_fname)
     #correlation_over_time(west, north, name=curr_fname)
-    ami_plot(west, name=curr_fname)
-    ami_plot(north, name=curr_fname)
-    cmi_plot(west, north, name=curr_fname)
+    #ami_plot(west, name=curr_fname)
+    #ami_plot(north, name=curr_fname)
+    #cmi_plot(west, north, name=curr_fname)
     #initial_mi_vals(west, north, name=curr_fname)
+    #print mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
+    hilbert_transform_phase_diff(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):

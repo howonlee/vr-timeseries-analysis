@@ -19,6 +19,8 @@ def mean_phase_coherence(first, second):
 
 def hilbert_transform_phase_diff(west, north, name):
     #phase diff modulus
+    plt.close()
+    plt.clf()
     hilbert_w_phase = hilbert_phase(west)
     hilbert_n_phase = hilbert_phase(north)
     diff = np.exp(1j * (hilbert_w_phase - hilbert_n_phase))
@@ -26,8 +28,7 @@ def hilbert_transform_phase_diff(west, north, name):
     plt.xlabel("time")
     plt.plot(diff)
     plt.ylabel("phase diff(w - n)")
-    plt.show()
-    #plt.savefig("./phase_diff/" + name)
+    plt.savefig("./phase_diff/" + name)
 
 def main():
     #should be full phase diff synced, right?
