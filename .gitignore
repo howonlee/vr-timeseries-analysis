@@ -1,3 +1,4 @@
 *.png
 *.pyc
 difference_poincares_ellipse/
+*.csv

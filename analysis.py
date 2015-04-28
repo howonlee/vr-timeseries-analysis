@@ -21,12 +21,11 @@ def coherence_over_time(west, north, name):
     west = np.array(west)
     north = np.array(north)
     to_plot = zip(west, north) #let's have transform
-    blocks = split the west and north data by 10s
-    cxy, f = plt.cohere(west, north)
-    print cxy, f
-    with open("./coherence_stats/" + name + "_%02d_stats" % (curr_plot,), "w") as stats_file:
-        for x in zip(cxy, f):
-            stats_file.write(x + "\n")
+    cxy, f = plt.cohere(west, north) #for freqs first
+    with open("./coherence_stats/" + name, "w") as stats_file:
+        stats_file.write(",".join(map(str, f)))
+        stats_file.write("\n")
+        stats_file.write(",".join(map(str, cxy)))
 
 def prob_dict(data):
     data = list(data)
@@ -73,14 +72,10 @@ def discretize_data(data, bucket_size=0.2):
     idx = np.digitize(data, buckets)
     return buckets[idx-1], idx
 
-def total_amis(data, name):
-###################################3
-    _, idx_w = discretize_data(west)
-    _, idx_n = discretize_data(north)
-    mis = cross_mutual_information(idx_w, idx_n, 1, 1)
-    mi_string = "%s,%s\n" % (name, str(mis[0]))
-    with open("initial_cmis.csv", "a") as initial_cmi:
-        initial_cmi.write(mi_string)
+def total_amis(data, name, num_points=10):
+    with open("./ami_csvs/" + name + ".csv", "w") as total_ami:
+        for idx, ami in enumerate(auto_mutual_information(data, num_points, len(data))):
+            total_ami.write(str(num_points) + " " + str(ami))
 
 def ami_plot(data, name, stepsize=1, max_bits=10, stepmax=50):
     digitized, idx = discretize_data(data)
@@ -97,14 +92,10 @@ def ami_plot(data, name, stepsize=1, max_bits=10, stepmax=50):
     plt.ylabel("ami (bits)")
     plt.savefig("./ami_plots/" + name)
 
-def total_cmis(west, north, name):
-###################################3
-    _, idx_w = discretize_data(west)
-    _, idx_n = discretize_data(north)
-    mis = cross_mutual_information(idx_w, idx_n, 1, 1)
-    mi_string = "%s,%s\n" % (name, str(mis[0]))
-    with open("initial_cmis.csv", "a") as initial_cmi:
-        initial_cmi.write(mi_string)
+def total_cmis(west, north, name, num_points=10):
+    with open("./cmi_csvs/" + name + ".csv", "w") as total_cmi:
+        for idx, cmi in enumerate(cross_mutual_information(west, north, num_points, len(west))):
+            total_cmi.write(str(num_points) + " " + str(cmi))
 
 def initial_mi_vals(west, north, name):
     _, idx_w = discretize_data(west)
@@ -190,15 +181,11 @@ def processed_glob_series(part_reader, curr_fname):
     for row in part_reader:
         west.append(process_num(row[1]))
         north.append(process_num(row[2]))
-    #difference_poincare_ellipse(west, north, name=curr_fname)
-    #difference_poincare_movie(west, north, name=curr_fname)
+
     coherence_over_time(west, north, name=curr_fname)
-    #correlation_over_time(west, north, name=curr_fname)
-    #ami_plot(west, name=curr_fname)
-    #ami_plot(north, name=curr_fname)
-    #cmi_plot(west, north, name=curr_fname)
-    #initial_mi_vals(west, north, name=curr_fname)
-    #hilbert_transform_phase_diff(west, north, name=curr_fname)
+    #total_amis(west, name=curr_fname + "_west")
+    #total_amis(north, name=curr_fname + "_north")
+    #total_cmis(west, north, name=curr_fname)
 
     #mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
     #hilbert_phase_diff_csv(west, north, name=curr_fname)
@@ -226,7 +213,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    globs = [globs[0]]
+    #globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
