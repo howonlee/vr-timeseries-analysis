@@ -182,13 +182,13 @@ def processed_glob_series(part_reader, curr_fname):
         west.append(process_num(row[1]))
         north.append(process_num(row[2]))
 
-    coherence_over_time(west, north, name=curr_fname)
+    #coherence_over_time(west, north, name=curr_fname)
     #total_amis(west, name=curr_fname + "_west")
     #total_amis(north, name=curr_fname + "_north")
     #total_cmis(west, north, name=curr_fname)
 
-    #mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
-    #hilbert_phase_diff_csv(west, north, name=curr_fname)
+    mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
+    hilbert_phase_diff_csv(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
