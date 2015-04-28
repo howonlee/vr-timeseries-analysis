@@ -7,7 +7,7 @@ def hilbert_phase(data):
     #data to phase, clean and spiffy
     return np.unwrap(np.angle(sci_sig.hilbert(data)))
 
-def mean_phase_coherence(first, second):
+def mean_phase_coherence(first, second, name):
     diff = first - second
     mean_sin = np.mean(np.sin(diff))
     mean_cos = np.mean(np.cos(diff))
@@ -15,6 +15,7 @@ def mean_phase_coherence(first, second):
     #but it confuses _me_ in complex number land
     #so let's say nix to Euler
     #no more or less complex
+    #save this one
     return math.sqrt(mean_sin ** 2 + mean_cos **2)
 
 def hilbert_transform_phase_diff(west, north, name):
@@ -29,6 +30,14 @@ def hilbert_transform_phase_diff(west, north, name):
     plt.plot(diff)
     plt.ylabel("phase diff(w - n)")
     plt.savefig("./phase_diff/" + name)
+
+def hilbert_phase_diff_csv(west, north, name):
+    hilbert_w_phase = hilbert_phase(west)
+    hilbert_n_phase = hilbert_phase(north)
+    diff = np.exp(1j * (hilbert_w_phase - hilbert_n_phase))
+    print "we fucked up"
+    #save the diffs
+
 
 def main():
     #should be full phase diff synced, right?

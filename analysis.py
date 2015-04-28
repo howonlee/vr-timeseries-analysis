@@ -17,20 +17,16 @@ import scipy.signal as sci_sig
 from hilbert_test import * #pollute that namespace woo
 from plots import *
 
-def coherence_over_time(west, north, name, points_per_frame=10):
+def coherence_over_time(west, north, name):
     west = np.array(west)
     north = np.array(north)
     to_plot = zip(west, north) #let's have transform
-    curr_plot = 0
-    for group in grouper(to_plot, points_per_frame):
-        group = filter(lambda x: x, group)
-        xs = map(operator.itemgetter(0), group)
-        ys = map(operator.itemgetter(1), group)
-        with open("./coherence_stats/" + name + "_%02d_stats" % (curr_plot,), "w") as stats_file:
-            stats_file.write("mean:%f\nstd1:%f\nstd1:%f" % (data_mean, sd1, sd2))
-
-def correlation_over_time(west, north, name, points_per_frame=10):
-    pass
+    blocks = split the west and north data by 10s
+    cxy, f = plt.cohere(west, north)
+    print cxy, f
+    with open("./coherence_stats/" + name + "_%02d_stats" % (curr_plot,), "w") as stats_file:
+        for x in zip(cxy, f):
+            stats_file.write(x + "\n")
 
 def prob_dict(data):
     data = list(data)
@@ -196,13 +192,16 @@ def processed_glob_series(part_reader, curr_fname):
         north.append(process_num(row[2]))
     #difference_poincare_ellipse(west, north, name=curr_fname)
     #difference_poincare_movie(west, north, name=curr_fname)
+    coherence_over_time(west, north, name=curr_fname)
     #correlation_over_time(west, north, name=curr_fname)
     #ami_plot(west, name=curr_fname)
     #ami_plot(north, name=curr_fname)
     #cmi_plot(west, north, name=curr_fname)
     #initial_mi_vals(west, north, name=curr_fname)
-    #print mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
     #hilbert_transform_phase_diff(west, north, name=curr_fname)
+
+    #mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
+    #hilbert_phase_diff_csv(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
@@ -227,7 +226,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    #globs = [globs[0]]
+    globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
