@@ -187,7 +187,7 @@ def processed_glob_series(part_reader, curr_fname):
     #total_amis(north, name=curr_fname + "_north")
     #total_cmis(west, north, name=curr_fname)
 
-    mean_phase_coherence(hilbert_phase(west), hilbert_phase(north))
+    block_phase_coherence(hilbert_phase(west), hilbert_phase(north), name=curr_fname)
     hilbert_phase_diff_csv(west, north, name=curr_fname)
 
 def filter_nan(member):
