@@ -186,9 +186,10 @@ def processed_glob_series(part_reader, curr_fname):
     #total_amis(west, name=curr_fname + "_west")
     #total_amis(north, name=curr_fname + "_north")
     #total_cmis(west, north, name=curr_fname)
+    quick_correlation(west, north)
 
-    block_phase_coherence(hilbert_phase(west), hilbert_phase(north), name=curr_fname)
-    hilbert_phase_diff_csv(west, north, name=curr_fname)
+    #block_phase_coherence(hilbert_phase(west), hilbert_phase(north), name=curr_fname)
+    #hilbert_phase_diff_csv(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
@@ -198,6 +199,13 @@ def filter_nan(member):
 def process_row(row):
     row = map(float, row)
     return map(filter_nan, row)
+
+def quick_correlation(west, north):
+    plt.close()
+    #50 seconds worth, meaning 400 frames worth
+    cross_corrs = sci_sig.correlate(west, north, "same")
+    plt.plot(cross_corrs)
+    plt.show()
 
 def unprocessed_glob_series(part_reader, curr_fname):
     rows = list(part_reader)
@@ -213,7 +221,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    #globs = [globs[0]]
+    globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
