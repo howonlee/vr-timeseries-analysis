@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import pandas.tools.plotting as pd_plot
 import scipy.signal as sci_sig
-import scipy.stats.stats as sci_stats
+import scipy.stats as sci_stats
 
 def process_num(num_str):
     if num_str == "NA":
@@ -28,10 +28,10 @@ def correlations_over_time(wests, norths):
     for west, north in zip(wests, norths):
         #pearsons correlation, window 400
         curr_correlations = []
-        for x in xrange(400, 1500, 10): ########
-            west_window = west[0 + (x - 400):x]
-            north_window = north[0 + (x - 400):x]
-            curr_correlations.append(sci_stats.pearsonr(west_window, north_window)[0])
+        for x in xrange(0, 100): ########
+            west_window = west[0 : 400]
+            north_window = north[x : 400+x]
+            curr_correlations.append(sci_stats.stats.pearsonr(west_window, north_window)[0])
         plt.plot(curr_correlations, color="blue", alpha=0.1)
         correlations.append(curr_correlations)
     plt.savefig("./wholes/correlations_over_time_mc")
@@ -41,13 +41,18 @@ def correlations_over_time(wests, norths):
         for idx, member in enumerate(correlation):
             if not math.isnan(member):
                 average_correlations[idx] += member
-    print average_correlations
     average_correlations = np.divide(average_correlations, len(correlations))
-    print average_correlations
-    print len(correlations)
+    #not actually a correlation matrix, but a matrix with a bunch of correlations in it
+    #confusing, no?
+    #corr_mat = np.zeros((len(correlations), len(correlations[0])))
+    #for x, correlation in enumerate(correlations):
+    #    for y, member in enumerate(correlation):
+    #        if not math.isnan(member):
+    #            corr_mat[x,y] = member
+    #stds = np.std(corr_mat, axis=0)
+    #dfs = np.ones_like(stds) * 6000
     plt.plot(average_correlations)
-    #got to get the pointwise sd and plot it
-    #avg and pointwise sd, I think? need pointwise sd too
+    #plt.errorbar(range(average_correlations.size), average_correlations, yerr=sci_stats.t.ppf(0.95, dfs) * stds)
     plt.savefig("./wholes/correlations_over_time_summary")
 
 def coherences_over_time(wests, norths):
