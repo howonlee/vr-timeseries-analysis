@@ -28,12 +28,11 @@ def correlations_over_time(wests, norths):
     for west, north in zip(wests, norths):
         #pearsons correlation, window 400
         curr_correlations = []
-        for x in []: ########
-            #west_window = something
-            #north_window = something
-            #curr_correlations.append(sci_stats.pearsonr(west_window, north_window)[0])
-            pass
-        plt.plot(curr_correlations)
+        for x in xrange(400, 1500, 10): ########
+            west_window = west[0 + (x - 400):x]
+            north_window = north[0 + (x - 400):x]
+            curr_correlations.append(sci_stats.pearsonr(west_window, north_window)[0])
+        plt.plot(curr_correlations, color="blue", alpha=0.1)
         correlations.append(curr_correlations)
     plt.savefig("./wholes/correlations_over_time_mc")
     plt.close()
@@ -41,34 +40,36 @@ def correlations_over_time(wests, norths):
     for correlation in correlations:
         for idx, member in enumerate(correlation):
             average_correlations[idx] += member
-    #divide by the number of correlations
+    np.divide(average_correlations, len(correlations[0]))
+    plt.plot(average_correlations)
+    #got to get the pointwise sd and plot it
     #avg and pointwise sd, I think? need pointwise sd too
     plt.savefig("./wholes/correlations_over_time_summary")
 
-def coherences_over_time():
+def coherences_over_time(wests, norths):
     #no changes from the original diffs
     plt.close()
     pass
     plt.savefig("./wholes/correlations_over_time")
 
-def total_amis():
+def total_amis(wests, norths):
     plt.close()
     #abstract away the ami information
     pass
     plt.savefig("./wholes/amis")
 
-def total_cmis():
+def total_cmis(wests, norths):
     plt.close()
     pass
     plt.savefig("./wholes/cmis")
 
-def hilbert_phase_diffs():
+def hilbert_phase_diffs(wests, norths):
     plt.close()
     #no changes from the original diffs
     pass
     plt.savefig("./wholes/hilbert_phase_diffs")
 
-def block_phase_coherences():
+def block_phase_coherences(wests, norths):
     plt.close()
     #no changes from the original diffs
     pass
@@ -93,7 +94,7 @@ def whole_series(globs):
             norths.append(curr_north)
 
     correlations_over_time(wests, norths)
-    #do the thing
+    #coherences_over_time(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
