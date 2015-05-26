@@ -39,8 +39,12 @@ def correlations_over_time(wests, norths):
     average_correlations = np.zeros(len(correlations[0])) #should be 1500
     for correlation in correlations:
         for idx, member in enumerate(correlation):
-            average_correlations[idx] += member
-    np.divide(average_correlations, len(correlations[0]))
+            if not math.isnan(member):
+                average_correlations[idx] += member
+    print average_correlations
+    average_correlations = np.divide(average_correlations, len(correlations))
+    print average_correlations
+    print len(correlations)
     plt.plot(average_correlations)
     #got to get the pointwise sd and plot it
     #avg and pointwise sd, I think? need pointwise sd too
