@@ -34,6 +34,9 @@ def correlations_over_time(wests, norths):
             curr_correlations.append(sci_stats.stats.pearsonr(west_window, north_window)[0])
         plt.plot(curr_correlations, color="blue", alpha=0.1)
         correlations.append(curr_correlations)
+    plt.ylabel("correlation synchrony score")
+    plt.xlabel("offset")
+    plt.title("simultaneous correlation plot")
     plt.savefig("./wholes/correlations_over_time_mc")
     plt.close()
     average_correlations = np.zeros(len(correlations[0])) #should be 1500
@@ -51,15 +54,44 @@ def correlations_over_time(wests, norths):
     #            corr_mat[x,y] = member
     #stds = np.std(corr_mat, axis=0)
     #dfs = np.ones_like(stds) * 6000
-    plt.plot(average_correlations)
     #plt.errorbar(range(average_correlations.size), average_correlations, yerr=sci_stats.t.ppf(0.95, dfs) * stds)
+    plt.plot(average_correlations)
+    plt.ylabel("correlation synchrony score")
+    plt.xlabel("offset")
+    plt.title("average correlation plot")
     plt.savefig("./wholes/correlations_over_time_summary")
 
 def coherences_over_time(wests, norths):
-    #no changes from the original diffs
     plt.close()
-    pass
-    plt.savefig("./wholes/correlations_over_time")
+    coherences = []
+    for west, north in zip(wests, norths):
+        curr_coherences = []
+        for x in xrange(0, 100): ######## use np.roll
+####################################################
+####################################################
+####################################################
+            west_window = west[0 : 400]
+            north_window = north[x : 400+x]
+            curr_coherences.append(sci_sig.coherence(west_window, north_window))
+        #get freqs and cxy, must plot according to those
+        plt.plot(curr_coherences, color="blue", alpha=0.1)
+        coherences.append(curr_coherences)
+    plt.ylabel("coherence synchrony score")
+    plt.xlabel("offset")
+    plt.title("simultaneous coherence plot")
+    plt.savefig("./wholes/coherence_mc")
+    plt.close()
+    average_coherences = np.zeros(len(coherences[0])) #should be 1500
+    for coherence in coherences:
+        for idx, member in enumerate(coherence):
+            if not math.isnan(member):
+                average_coherences[idx] += member
+    average_coherences = np.divide(average_coherences, len(coherences))
+    plt.plot(average_coherences)
+    plt.ylabel("coherence synchrony score")
+    plt.xlabel("offset")
+    plt.title("average coherence plot")
+    plt.savefig("./wholes/coherences_over_time_summary")
 
 def total_amis(wests, norths):
     plt.close()
