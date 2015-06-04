@@ -45,16 +45,6 @@ def correlations_over_time(wests, norths):
             if not math.isnan(member):
                 average_correlations[idx] += member
     average_correlations = np.divide(average_correlations, len(correlations))
-    #not actually a correlation matrix, but a matrix with a bunch of correlations in it
-    #confusing, no?
-    #corr_mat = np.zeros((len(correlations), len(correlations[0])))
-    #for x, correlation in enumerate(correlations):
-    #    for y, member in enumerate(correlation):
-    #        if not math.isnan(member):
-    #            corr_mat[x,y] = member
-    #stds = np.std(corr_mat, axis=0)
-    #dfs = np.ones_like(stds) * 6000
-    #plt.errorbar(range(average_correlations.size), average_correlations, yerr=sci_stats.t.ppf(0.95, dfs) * stds)
     plt.plot(average_correlations)
     plt.ylabel("correlation synchrony score")
     plt.xlabel("offset")
@@ -157,69 +147,39 @@ def total_cmis(wests, norths):
     plt.title("average coherence plot")
     plt.savefig("./wholes/coherences_over_time_summary")
 
+def hilbert_phase(data):
+    #data to phase, clean and spiffy
+    return np.unwrap(np.angle(sci_sig.hilbert(data)))
+
 def hilbert_phase_diffs(wests, norths):
     plt.close()
-    coherences = []
+    diffs = []
     for west, north in zip(wests, norths):
-        curr_coherences = []
-        for x in xrange(0, 100): ######## use np.roll
-####################################################
-####################################################
-####################################################
-            west_window = west[0 : 400]
-            north_window = north[x : 400+x]
-            curr_coherences.append(sci_sig.coherence(west_window, north_window))
+        curr_diffs = []
+        for x in xrange(0, 100):
+            hilbert_w_phase = hilbert_phase(west)
+            hilbert_n_phase = hilbert_phase(north)
+            diff = np.exp(1j * (hilbert_w_phase - hilbert_n_phase))
+            curr_diffs.append(diff)
         #get freqs and cxy, must plot according to those
-        plt.plot(curr_coherences, color="blue", alpha=0.1)
-        coherences.append(curr_coherences)
-    plt.ylabel("coherence synchrony score")
-    plt.xlabel("offset")
-    plt.title("simultaneous coherence plot")
-    plt.savefig("./wholes/coherence_mc")
+        plt.plot(curr_diffs, color="blue", alpha=0.1)
+        diffs.append(curr_diffs)
+    plt.ylabel("analytic signal difference")
+    plt.xlabel("phase")
+    plt.title("hilbert phase difference")
+    plt.savefig("./wholes/hilbert_mc")
     plt.close()
-    average_coherences = np.zeros(len(coherences[0])) #should be 1500
-    for coherence in coherences:
-        for idx, member in enumerate(coherence):
+    average_diffs = np.zeros(len(diffs[0])) #should be 1500
+    for diff in diffs:
+        for idx, member in enumerate(diff):
             if not math.isnan(member):
-                average_coherences[idx] += member
-    average_coherences = np.divide(average_coherences, len(coherences))
-    plt.plot(average_coherences)
-    plt.ylabel("coherence synchrony score")
-    plt.xlabel("offset")
-    plt.title("average coherence plot")
-    plt.savefig("./wholes/coherences_over_time_summary")
-
-def block_phase_coherences(wests, norths):
-    plt.close()
-    coherences = []
-    for west, north in zip(wests, norths):
-        curr_coherences = []
-        for x in xrange(0, 100): ######## use np.roll
-####################################################
-####################################################
-####################################################
-            west_window = west[0 : 400]
-            north_window = north[x : 400+x]
-            curr_coherences.append(sci_sig.coherence(west_window, north_window))
-        #get freqs and cxy, must plot according to those
-        plt.plot(curr_coherences, color="blue", alpha=0.1)
-        coherences.append(curr_coherences)
-    plt.ylabel("coherence synchrony score")
-    plt.xlabel("offset")
-    plt.title("simultaneous coherence plot")
-    plt.savefig("./wholes/coherence_mc")
-    plt.close()
-    average_coherences = np.zeros(len(coherences[0])) #should be 1500
-    for coherence in coherences:
-        for idx, member in enumerate(coherence):
-            if not math.isnan(member):
-                average_coherences[idx] += member
-    average_coherences = np.divide(average_coherences, len(coherences))
-    plt.plot(average_coherences)
-    plt.ylabel("coherence synchrony score")
-    plt.xlabel("offset")
-    plt.title("average coherence plot")
-    plt.savefig("./wholes/coherences_over_time_summary")
+                average_diff[idx] += member
+    average_diffs = np.divide(average_diffs, len(diffs))
+    plt.plot(avarage_diffs)
+    plt.ylabel("analytic signal difference")
+    plt.xlabel("phase")
+    plt.title("average hilbert phase difference")
+    plt.savefig("./wholes/hilbert_summary")
 
 def whole_series(globs):
     wests = []
