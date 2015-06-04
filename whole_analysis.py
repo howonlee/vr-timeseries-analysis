@@ -194,9 +194,11 @@ def whole_series(globs):
             wests.append(curr_west)
             norths.append(curr_north)
 
-    correlations_over_time(wests, norths)
-    coherences_over_time(wests, norths)
-    hilbert_phase_diffs(wests, norths)
+    #correlations_over_time(wests, norths)
+    #coherences_over_time(wests, norths)
+    #hilbert_phase_diffs(wests, norths)
+    total_amis(wests, norths)
+    total_cmis(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
