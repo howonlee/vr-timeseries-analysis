@@ -190,7 +190,7 @@ def whole_series(globs):
 
     #correlations_over_time(wests, norths)
     #coherences_over_time(wests, norths)
-    hilbert_phase_diffs(wests, norths)
+    #hilbert_phase_diffs(wests, norths)
 
     #total_amis(wests, norths)
     #total_cmis(wests, norths)
