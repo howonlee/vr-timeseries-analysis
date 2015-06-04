@@ -149,27 +149,22 @@ def hilbert_phase_diffs(wests, norths):
     plt.close()
     diffs = []
     for west, north in zip(wests, norths):
-        curr_diffs = []
-        for x in xrange(0, 100):
-            hilbert_w_phase = hilbert_phase(west)
-            hilbert_n_phase = hilbert_phase(north)
-            diff = np.exp(1j * (hilbert_w_phase - hilbert_n_phase))
-            curr_diffs.append(diff)
-        #get freqs and cxy, must plot according to those
-        plt.plot(curr_diffs, color="blue", alpha=0.1)
-        diffs.append(curr_diffs)
+        hilbert_w_phase = hilbert_phase(west)
+        hilbert_n_phase = hilbert_phase(north)
+        curr_diff = np.exp(1j * (hilbert_w_phase - hilbert_n_phase))
+        plt.plot(curr_diff, color="blue", alpha=0.01)
+        diffs.append(curr_diff)
     plt.ylabel("analytic signal difference")
     plt.xlabel("phase")
     plt.title("hilbert phase difference")
     plt.savefig("./wholes/hilbert_mc")
     plt.close()
-    average_diffs = np.zeros(len(diffs[0])) #should be 1500
+    average_diffs = np.zeros_like(diffs[0]) #should be 1500
     for diff in diffs:
         for idx, member in enumerate(diff):
-            if not math.isnan(member):
-                average_diff[idx] += member
+            average_diffs[idx] += member
     average_diffs = np.divide(average_diffs, len(diffs))
-    plt.plot(avarage_diffs)
+    plt.plot(average_diffs)
     plt.ylabel("analytic signal difference")
     plt.xlabel("phase")
     plt.title("average hilbert phase difference")
@@ -194,8 +189,8 @@ def whole_series(globs):
             norths.append(curr_north)
 
     #correlations_over_time(wests, norths)
-    coherences_over_time(wests, norths)
-    #hilbert_phase_diffs(wests, norths)
+    #coherences_over_time(wests, norths)
+    hilbert_phase_diffs(wests, norths)
 
     #total_amis(wests, norths)
     #total_cmis(wests, norths)
@@ -203,5 +198,5 @@ def whole_series(globs):
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     globs = processed_globs #take this out when necessary
-    globs = [globs[0]]
+    #globs = [globs[0]]
     whole_series(globs)
