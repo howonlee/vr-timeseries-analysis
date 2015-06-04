@@ -59,18 +59,17 @@ def coherences_over_time(wests, norths):
         for x in xrange(0, 100): ######## use np.roll
             curr_coherences.append(plt.cohere(west, north)[0])
         #get freqs and cxy, must plot according to those
-        plt.plot(curr_coherences, color="blue", alpha=0.1)
+        plt.plot(curr_coherences[-1], color="blue", alpha=0.1)
         coherences.append(curr_coherences)
     plt.ylabel("coherence synchrony score")
     plt.xlabel("offset")
     plt.title("simultaneous coherence plot")
     plt.savefig("./wholes/coherence_mc")
     plt.close()
-    average_coherences = np.zeros(len(coherences[0])) #should be 1500
+    average_coherences = np.zeros_like(coherences[0][0]) #should be 1500
     for coherence in coherences:
         for idx, member in enumerate(coherence):
-            if not math.isnan(member):
-                average_coherences[idx] += member
+            average_coherences += member
     average_coherences = np.divide(average_coherences, len(coherences))
     plt.plot(average_coherences)
     plt.ylabel("coherence synchrony score")
@@ -195,13 +194,14 @@ def whole_series(globs):
             norths.append(curr_north)
 
     #correlations_over_time(wests, norths)
-    #coherences_over_time(wests, norths)
+    coherences_over_time(wests, norths)
     #hilbert_phase_diffs(wests, norths)
-    total_amis(wests, norths)
-    total_cmis(wests, norths)
+
+    #total_amis(wests, norths)
+    #total_cmis(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     globs = processed_globs #take this out when necessary
-    #globs = [globs[0]]
+    globs = [globs[0]]
     whole_series(globs)
