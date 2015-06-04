@@ -57,12 +57,7 @@ def coherences_over_time(wests, norths):
     for west, north in zip(wests, norths):
         curr_coherences = []
         for x in xrange(0, 100): ######## use np.roll
-####################################################
-####################################################
-####################################################
-            west_window = west[0 : 400]
-            north_window = north[x : 400+x]
-            curr_coherences.append(sci_sig.coherence(west_window, north_window))
+            curr_coherences.append(plt.cohere(west, north)[0])
         #get freqs and cxy, must plot according to those
         plt.plot(curr_coherences, color="blue", alpha=0.1)
         coherences.append(curr_coherences)
@@ -200,7 +195,8 @@ def whole_series(globs):
             norths.append(curr_north)
 
     correlations_over_time(wests, norths)
-    #coherences_over_time(wests, norths)
+    coherences_over_time(wests, norths)
+    hilbert_phase_diffs(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
