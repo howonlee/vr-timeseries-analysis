@@ -77,69 +77,95 @@ def coherences_over_time(wests, norths):
     plt.title("average coherence plot")
     plt.savefig("./wholes/coherences_over_time_summary")
 
-def total_amis(wests, norths):
+def prob_dict(data):
+    data = list(data)
+    alphabet = set(data)
+    probdict = {}
+    for symbol in alphabet:
+        ctr = sum(1 for x in data if x == symbol)
+        probdict[symbol] = (float(ctr) / len(data))
+    return probdict
+
+def entropy(data):
+    data_probs = prob_dict(data)
+    return sum(-p * np.log2(p) for _, p in data_probs.iteritems())
+
+def joint_entropy(data1, data2):
+    probs = []
+    data1, data2 = np.array(data1, dtype=np.int16), np.array(data2, dtype=np.int16)
+    #should look at the sparsity of things
+    for c1 in set(data1):
+        for c2 in set(data2):
+            probs.append(np.mean(np.logical_and(data1 == c1, data2 == c2)))
+    probs = filter(lambda x: x != 0.0, probs)
+    return np.sum(-p * np.log2(p) for p in probs)
+
+def mutual_information(data1, data2):
+    data1, data2 = list(data1), list(data2)
+    return entropy(data1) + entropy(data2) - joint_entropy(data1, data2)
+
+def auto_mutual_information(data, stepsize, stepmax):
+    return cross_mutual_information(data, data, stepsize, stepmax)
+
+def cross_mutual_information(data1, data2, stepsize, stepmax):
+    first = np.array(data1)
+    cmis = []
+    for lag in xrange(0, stepmax, stepsize):
+        lagged = np.roll(data2, -lag)
+        cmis.append(mutual_information(first, lagged))
+    return cmis
+
+def total_amis(series, name):
     plt.close()
-    coherences = []
-    for west, north in zip(wests, norths):
-        curr_coherences = []
-        for x in xrange(0, 100): ######## use np.roll
-####################################################
-####################################################
-####################################################
-            west_window = west[0 : 400]
-            north_window = north[x : 400+x]
-            curr_coherences.append(sci_sig.coherence(west_window, north_window))
+    amis = []
+    stepsize = 2
+    stepmax = 50
+    for member in series:
+        ami = auto_mutual_information(member, stepsize, stepmax)
         #get freqs and cxy, must plot according to those
-        plt.plot(curr_coherences, color="blue", alpha=0.1)
-        coherences.append(curr_coherences)
-    plt.ylabel("coherence synchrony score")
+        plt.plot(ami, color="blue", alpha=0.1)
+        amis.append(ami)
+    plt.ylabel("auto mutual information (bits)")
     plt.xlabel("offset")
-    plt.title("simultaneous coherence plot")
-    plt.savefig("./wholes/coherence_mc")
+    plt.title("simultaneous auto mutual information plot")
+    plt.savefig("./wholes/" + name + "_ami_mc")
     plt.close()
-    average_coherences = np.zeros(len(coherences[0])) #should be 1500
-    for coherence in coherences:
-        for idx, member in enumerate(coherence):
-            if not math.isnan(member):
-                average_coherences[idx] += member
-    average_coherences = np.divide(average_coherences, len(coherences))
-    plt.plot(average_coherences)
-    plt.ylabel("coherence synchrony score")
+    average_amis = np.zeros(len(ami)) #should be 1500
+    for ami in amis:
+        for idx, member in enumerate(ami):
+            average_amis[idx] += member
+    average_amis = np.divide(average_amis, len(amis))
+    plt.plot(average_amis)
+    plt.ylabel("auto mutual information (bits)")
     plt.xlabel("offset")
-    plt.title("average coherence plot")
-    plt.savefig("./wholes/coherences_over_time_summary")
+    plt.title("average auto mutual information plot")
+    plt.savefig("./wholes/" + name + "_ami_summary")
 
 def total_cmis(wests, norths):
     plt.close()
-    coherences = []
+    cmis = []
+    stepsize = 2
+    stepmax = 50
     for west, north in zip(wests, norths):
-        curr_coherences = []
-        for x in xrange(0, 100): ######## use np.roll
-####################################################
-####################################################
-####################################################
-            west_window = west[0 : 400]
-            north_window = north[x : 400+x]
-            curr_coherences.append(sci_sig.coherence(west_window, north_window))
+        cmi = cross_mutual_information(west, north, stepsize, stepmax)
         #get freqs and cxy, must plot according to those
-        plt.plot(curr_coherences, color="blue", alpha=0.1)
-        coherences.append(curr_coherences)
-    plt.ylabel("coherence synchrony score")
+        plt.plot(cmi, color="blue", alpha=0.1)
+        cmis.append(cmi)
+    plt.ylabel("cross mutual information (bits)")
     plt.xlabel("offset")
-    plt.title("simultaneous coherence plot")
-    plt.savefig("./wholes/coherence_mc")
+    plt.title("simultaneous cross mutual information plot")
+    plt.savefig("./wholes/cmi_mc")
     plt.close()
-    average_coherences = np.zeros(len(coherences[0])) #should be 1500
-    for coherence in coherences:
-        for idx, member in enumerate(coherence):
-            if not math.isnan(member):
-                average_coherences[idx] += member
-    average_coherences = np.divide(average_coherences, len(coherences))
-    plt.plot(average_coherences)
-    plt.ylabel("coherence synchrony score")
+    average_cmis = np.zeros(len(cmi)) #should be 1500
+    for cmi in cmis:
+        for idx, member in enumerate(cmi):
+            average_cmis[idx] += member
+    average_cmis = np.divide(average_cmis, len(cmis))
+    plt.plot(average_cmis)
+    plt.ylabel("cross mutual information (bits)")
     plt.xlabel("offset")
-    plt.title("average coherence plot")
-    plt.savefig("./wholes/coherences_over_time_summary")
+    plt.title("average cross mutual information plot")
+    plt.savefig("./wholes/cmi_summary")
 
 def hilbert_phase(data):
     #data to phase, clean and spiffy
@@ -191,8 +217,8 @@ def whole_series(globs):
     #correlations_over_time(wests, norths)
     #coherences_over_time(wests, norths)
     #hilbert_phase_diffs(wests, norths)
-
-    #total_amis(wests, norths)
+    total_amis(wests, "wests")
+    total_amis(norths, "norths")
     #total_cmis(wests, norths)
 
 if __name__ == "__main__":
