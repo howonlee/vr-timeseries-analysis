@@ -66,6 +66,7 @@ def coherences_over_time(wests, norths):
     plt.title("simultaneous coherence plot")
     plt.savefig("./wholes/coherence_mc")
     plt.close()
+    """
     average_coherences = np.zeros_like(coherences[0][0]) #should be 1500
     for coherence in coherences:
         for idx, member in enumerate(coherence):
@@ -76,6 +77,7 @@ def coherences_over_time(wests, norths):
     plt.xlabel("offset")
     plt.title("average coherence plot")
     plt.savefig("./wholes/coherences_over_time_summary")
+    """
 
 def prob_dict(data):
     data = list(data)
@@ -171,6 +173,30 @@ def hilbert_phase(data):
     #data to phase, clean and spiffy
     return np.unwrap(np.angle(sci_sig.hilbert(data)))
 
+def mean_phase_coherence(first, second):
+    diff = first - second
+    mean_sin = np.mean(np.sin(diff))
+    mean_cos = np.mean(np.cos(diff))
+    #absolute value is not actually ambiguous
+    #but it confuses _me_ in complex number land
+    #so let's say nix to Euler
+    #no more or less complex
+    #save this one
+    return math.sqrt(mean_sin ** 2 + mean_cos **2)
+
+def total_gammas(wests, norths):
+    coherences = []
+    for west, north in zip(wests, norths):
+        coherences.append(mean_phase_coherence(hilbert_phase(west), hilbert_phase(north)))
+    plt.hist(coherences)
+    plt.xlabel("gamma")
+    plt.ylabel("value")
+    plt.savefig("total_gammas")
+
+def hilbert_phase(data):
+    #data to phase, clean and spiffy
+    return np.unwrap(np.angle(sci_sig.hilbert(data)))
+
 def hilbert_phase_diffs(wests, norths):
     plt.close()
     diffs = []
@@ -215,11 +241,12 @@ def whole_series(globs):
             norths.append(curr_north)
 
     #correlations_over_time(wests, norths)
-    #coherences_over_time(wests, norths)
+    coherences_over_time(wests, norths)
     #hilbert_phase_diffs(wests, norths)
-    total_amis(wests, "wests")
-    total_amis(norths, "norths")
+    #total_amis(wests, "wests")
+    #total_amis(norths, "norths")
     #total_cmis(wests, norths)
+    #total_gammas(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
