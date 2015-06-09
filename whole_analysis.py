@@ -199,14 +199,13 @@ def total_gamma_hist(wests, norths):
     coherences = []
     for west, north in zip(wests, norths):
         coherences.append(mean_phase_coherence(hilbert_phase(west), hilbert_phase(north)))
-    #normalize right here, friends
-#################
-#################
-#################
-    curr_hist = np.hist(coherences)
-    with open("./hist/total_gammas") as gamma_file:
-        for x in curr_hist.size:
-            gamma_file.write(str(x) + "\n")
+    coherence_max = float(max(coherences))
+    coherences = [coherence / coherence_max for coherence in coherences]
+    coherences = map(zero_nan, coherences)
+    curr_hist = np.histogram(coherences, bins=30)
+    with open("./hist/total_gammas", "w") as gamma_file:
+        for x in xrange(curr_hist[0].size):
+            gamma_file.write(str(curr_hist[0][x]) + "\n")
 
 def total_cmi_hist(wests, norths):
     cmis = []
@@ -215,22 +214,31 @@ def total_cmi_hist(wests, norths):
     for west, north in zip(wests, norths):
         cmi = cross_mutual_information(west, north, stepsize, stepmax)
         cmis.append(cmi)
-    ############3 normalize!
-############
-############
-############
-    cmi_hist = np.hist(cmis)
+    cmi_max = float(max(cmis))
+    cmis = [cmi / cmi_max for cmi in cmis]
+    cmis = map(zero_nan, cmis)
+    curr_hist = np.histogram(cmis, bins=30)
+    with open("./hist/total_cmis", "w") as cmi_file:
+        for x in xrange(curr_hist[0].size):
+            cmi_file.write(str(curr_hist[0][x]) + "\n")
+
+def zero_nan(x):
+    if math.isnan(x):
+        return 0
+    return x
 
 def total_corr_hist(wests, norths):
     correlations = []
     for west, north in zip(wests, norths):
         #pearsons correlation, window 400
         correlations.append(sci_stats.stats.pearsonr(west, north)[0])
-############
-############ normalize!
-############
-    correlations_hist = np.hist(correlations)
-    return correlations
+    correlation_max = float(max(correlations))
+    correlations = [correlation / correlation_max for correlation in correlations]
+    correlations = map(zero_nan, correlations)
+    curr_hist = np.histogram(correlations, bins=30)
+    with open("./hist/total_correlations", "w") as correlation_file:
+        for x in xrange(curr_hist[0].size):
+            correlation_file.write(str(curr_hist[0][x]) + "\n")
 
 def hilbert_phase(data):
     #data to phase, clean and spiffy
@@ -285,8 +293,8 @@ def whole_series(globs):
     #total_amis(norths, "norths")
     #total_gammas(wests, norths)
     total_corr_hist(wests, norths)
-    total_cmi_hist(wests, norths)
     total_gamma_hist(wests, norths)
+    total_cmi_hist(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
