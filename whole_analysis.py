@@ -196,18 +196,19 @@ def total_gammas(wests, norths):
     plt.savefig("total_gammas")
 
 def total_gamma_hist(wests, norths):
+    print "gamma hist"
     coherences = []
     for west, north in zip(wests, norths):
         coherences.append(mean_phase_coherence(hilbert_phase(west), hilbert_phase(north)))
     coherence_max = float(max(coherences))
     coherences = [coherence / coherence_max for coherence in coherences]
-    coherences = map(zero_nan, coherences)
-    curr_hist = np.histogram(coherences, bins=30)
+    coherences = filter(lambda x: not math.isnan(x), coherences)
     with open("./hist/total_gammas", "w") as gamma_file:
-        for x in xrange(curr_hist[0].size):
-            gamma_file.write(str(curr_hist[0][x]) + "\n")
+        for coherence in coherences:
+            gamma_file.write(str(coherence) + "\n")
 
 def total_cmi_hist(wests, norths):
+    print "cmi hist"
     cmis = []
     stepsize = 2
     stepmax = 50
@@ -216,29 +217,23 @@ def total_cmi_hist(wests, norths):
         cmis.append(cmi)
     cmi_max = float(max(cmis))
     cmis = [cmi / cmi_max for cmi in cmis]
-    cmis = map(zero_nan, cmis)
-    curr_hist = np.histogram(cmis, bins=30)
+    cmis = filter(lambda x: not math.isnan(x), cmis)
     with open("./hist/total_cmis", "w") as cmi_file:
-        for x in xrange(curr_hist[0].size):
-            cmi_file.write(str(curr_hist[0][x]) + "\n")
-
-def zero_nan(x):
-    if math.isnan(x):
-        return 0
-    return x
+        for cmi in cmis:
+            cmi_file.write(str(cmi) + "\n")
 
 def total_corr_hist(wests, norths):
+    print "corr hist"
     correlations = []
     for west, north in zip(wests, norths):
         #pearsons correlation, window 400
         correlations.append(sci_stats.stats.pearsonr(west, north)[0])
     correlation_max = float(max(correlations))
     correlations = [correlation / correlation_max for correlation in correlations]
-    correlations = map(zero_nan, correlations)
-    curr_hist = np.histogram(correlations, bins=30)
+    correlations = filter(lambda x: not math.isnan(x), correlations)
     with open("./hist/total_correlations", "w") as correlation_file:
-        for x in xrange(curr_hist[0].size):
-            correlation_file.write(str(curr_hist[0][x]) + "\n")
+        for correlation in correlations:
+            correlation_file.write(str(correlation) + "\n")
 
 def hilbert_phase(data):
     #data to phase, clean and spiffy
@@ -292,8 +287,8 @@ def whole_series(globs):
     #total_amis(wests, "wests")
     #total_amis(norths, "norths")
     #total_gammas(wests, norths)
-    #total_corr_hist(wests, norths)
-    #total_gamma_hist(wests, norths)
+    total_corr_hist(wests, norths)
+    total_gamma_hist(wests, norths)
     total_cmi_hist(wests, norths)
 
 if __name__ == "__main__":
