@@ -2,6 +2,7 @@
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
 if __name__ == "__main__":
     sd1s = []
@@ -13,13 +14,16 @@ if __name__ == "__main__":
             sd1s.append(sd1)
             sd2s.append(sd2)
     print sd1s, sd2s
+    matplotlib.rcParams.update({"font.size": 20})
     plt.hist(sd1s)
     plt.xlabel("standard deviation")
-    plt.ylabel("frequency")
+    plt.ylabel("no. ellipses")
+    plt.tight_layout()
     plt.savefig("sd1_histogram")
     plt.close()
     plt.hist(sd2s)
     plt.xlabel("standard deviation")
-    plt.ylabel("frequency")
+    plt.ylabel("no. ellipses")
+    plt.tight_layout()
     plt.savefig("sd2_histogram")
     plt.close()

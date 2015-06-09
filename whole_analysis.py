@@ -8,6 +8,7 @@ import operator
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.mlab as mat_mlab
+import matplotlib
 import numpy.fft as np_f
 import numpy.linalg as np_l
 import numpy as np
@@ -43,12 +44,12 @@ def correlations_over_time(wests, norths):
     snapshot_100 = map(operator.itemgetter(-1), correlations)
     snapshot_100 = filter(lambda x: not math.isnan(x), snapshot_100)
     plt.close()
-    plt.hist(snapshot_100)
-    plt.show()
+    plt.hist(snapshot_50)
+    plt.tight_layout()
+    plt.savefig("./wholes/correlation_snapshot_50")
     #plt.ylabel("correlation synchrony score")
     #plt.xlabel("offset")
     #plt.title("simultaneous correlation plot")
-    #plt.savefig("./correlations/" + name)
     #plt.close()
     """
     average_correlations = np.zeros(len(correlations[0])) #should be 1500
@@ -293,15 +294,17 @@ def whole_series(globs):
             wests.append(curr_west)
             norths.append(curr_north)
 
-    correlations_over_time(wests, norths)
+    #correlations_over_time(wests, norths)
     #coherences_over_time(wests, norths)
-    #hilbert_phase_diffs(wests, norths)
+    hilbert_phase_diffs(wests, norths)
     #total_amis(wests, "wests")
     #total_amis(norths, "norths")
     #total_gammas(wests, norths)
 
 if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
+    font = {"size": 20}
+    matplotlib.rc("font", **font)
     globs = processed_globs #take this out when necessary
     #globs = [globs[0]]
     whole_series(globs)
