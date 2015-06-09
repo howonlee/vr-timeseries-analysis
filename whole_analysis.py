@@ -212,7 +212,7 @@ def total_cmi_hist(wests, norths):
     stepsize = 2
     stepmax = 50
     for west, north in zip(wests, norths):
-        cmi = cross_mutual_information(west, north, stepsize, stepmax)
+        cmi = cross_mutual_information(west, north, stepsize, stepmax)[10]
         cmis.append(cmi)
     cmi_max = float(max(cmis))
     cmis = [cmi / cmi_max for cmi in cmis]
@@ -292,8 +292,8 @@ def whole_series(globs):
     #total_amis(wests, "wests")
     #total_amis(norths, "norths")
     #total_gammas(wests, norths)
-    total_corr_hist(wests, norths)
-    total_gamma_hist(wests, norths)
+    #total_corr_hist(wests, norths)
+    #total_gamma_hist(wests, norths)
     total_cmi_hist(wests, norths)
 
 if __name__ == "__main__":
