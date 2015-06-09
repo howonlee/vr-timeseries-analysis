@@ -17,4 +17,4 @@ with open("total_cmis") as cmi_file:
     #cmis_sum = float(sum(cmis))
     #norm_cmis = [cmi / cmis_sum for cmi in cmis]
 
-print sci_stats.ks_2samp(corrs, gammas)
+print sci_stats.ks_2samp(corrs, cmis)
