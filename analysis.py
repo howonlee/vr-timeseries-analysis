@@ -5,6 +5,7 @@ import math
 import functools
 import itertools
 import operator
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.mlab as mat_mlab
@@ -233,6 +234,10 @@ def unprocessed_glob_series(part_reader, curr_fname):
         #difference_poincare_ellipse(row_w, row_n, name=row_fname)
 
 if __name__ == "__main__":
+    font = {'family' : 'normal',
+            'weight' : 'bold',
+            'size'   : 22}
+    matplotlib.rc('font', **font)
     ##### normalize all axes!!!!
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
