@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import pandas.tools.plotting as pd_plot
 import scipy.signal as sci_sig
+import scipy.stats as sci_stats
 from hilbert_test import * #pollute that namespace woo
 from plots import *
 
@@ -186,7 +187,8 @@ def processed_glob_series(part_reader, curr_fname):
     #total_amis(west, name=curr_fname + "_west")
     #total_amis(north, name=curr_fname + "_north")
     #total_cmis(west, north, name=curr_fname)
-    quick_correlation(west, north)
+    small_correlation(west, north, name=curr_fname)
+    #quick_correlation(west, north)
 
     #block_phase_coherence(hilbert_phase(west), hilbert_phase(north), name=curr_fname)
     #hilbert_phase_diff_csv(west, north, name=curr_fname)
@@ -199,6 +201,20 @@ def filter_nan(member):
 def process_row(row):
     row = map(float, row)
     return map(filter_nan, row)
+
+def small_correlation(west, north, name):
+    plt.close()
+    fig, ax = plt.subplots()
+    plt.xlabel("lag")
+    plt.ylabel("corr")
+    plt.title(name)
+    curr_correlations = []
+    for x in xrange(0, 100): ########
+        west_window = west[0 : 400]
+        north_window = north[x : 400+x]
+        curr_correlations.append(sci_stats.stats.pearsonr(west_window, north_window)[0])
+    plt.plot(curr_correlations, color="blue")
+    plt.savefig("./correlations/" + name)
 
 def quick_correlation(west, north):
     plt.close()
@@ -221,7 +237,7 @@ if __name__ == "__main__":
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")
     #unprocessed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*0.csv")
     globs = processed_globs #take this out when necessary
-    globs = [globs[0]]
+    #globs = [globs[0]]
     for curr_path in globs:
         path_splits = os.path.split(curr_path)[1].split(".", 2)
         curr_fname = "".join([path_splits[0], path_splits[1]])
