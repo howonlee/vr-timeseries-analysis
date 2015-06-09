@@ -22,7 +22,7 @@ def process_num(num_str):
     else:
         return float(num_str)
 
-def correlations_over_time(wests, norths, name):
+def correlations_over_time(wests, norths):
     plt.close()
     correlations = []
     for west, north in zip(wests, norths):
@@ -34,11 +34,22 @@ def correlations_over_time(wests, norths, name):
             curr_correlations.append(sci_stats.stats.pearsonr(west_window, north_window)[0])
         plt.plot(curr_correlations, color="blue", alpha=0.1)
         correlations.append(curr_correlations)
-    plt.ylabel("correlation synchrony score")
-    plt.xlabel("offset")
-    plt.title("simultaneous correlation plot")
-    plt.savefig("./correlations/" + name)
+    #1, 50, 100
+    snapshot_1 = map(operator.itemgetter(0), correlations)
+    snapshot_1 = filter(lambda x: not math.isnan(x), snapshot_1)
+    print snapshot_1
+    snapshot_50 = map(operator.itemgetter(49), correlations)
+    snapshot_50 = filter(lambda x: not math.isnan(x), snapshot_50)
+    snapshot_100 = map(operator.itemgetter(-1), correlations)
+    snapshot_100 = filter(lambda x: not math.isnan(x), snapshot_100)
     plt.close()
+    plt.hist(snapshot_100)
+    plt.show()
+    #plt.ylabel("correlation synchrony score")
+    #plt.xlabel("offset")
+    #plt.title("simultaneous correlation plot")
+    #plt.savefig("./correlations/" + name)
+    #plt.close()
     """
     average_correlations = np.zeros(len(correlations[0])) #should be 1500
     for correlation in correlations:
