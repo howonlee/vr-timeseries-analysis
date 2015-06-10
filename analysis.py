@@ -188,11 +188,12 @@ def processed_glob_series(part_reader, curr_fname):
     #total_amis(west, name=curr_fname + "_west")
     #total_amis(north, name=curr_fname + "_north")
     #total_cmis(west, north, name=curr_fname)
-    small_correlation(west, north, name=curr_fname)
+    #small_correlation(west, north, name=curr_fname)
     #quick_correlation(west, north)
 
     #block_phase_coherence(hilbert_phase(west), hilbert_phase(north), name=curr_fname)
     #hilbert_phase_diff_csv(west, north, name=curr_fname)
+    hilbert_transform_phase_diff(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):
@@ -234,9 +235,7 @@ def unprocessed_glob_series(part_reader, curr_fname):
         #difference_poincare_ellipse(row_w, row_n, name=row_fname)
 
 if __name__ == "__main__":
-    font = {'family' : 'normal',
-            'weight' : 'bold',
-            'size'   : 22}
+    font = {"size": 20}
     matplotlib.rc('font', **font)
     ##### normalize all axes!!!!
     processed_globs = glob.glob("/home/curuinor/data/vr_synchrony/*.csv_summed_*.csv")

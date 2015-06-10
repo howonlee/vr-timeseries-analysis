@@ -146,42 +146,49 @@ def total_amis(series, name):
     plt.title("simultaneous auto mutual information plot")
     plt.savefig("./wholes/" + name + "_ami_mc")
     plt.close()
-    average_amis = np.zeros(len(ami)) #should be 1500
-    for ami in amis:
-        for idx, member in enumerate(ami):
-            average_amis[idx] += member
-    average_amis = np.divide(average_amis, len(amis))
-    plt.plot(average_amis)
-    plt.ylabel("auto mutual information (bits)")
-    plt.xlabel("offset")
-    plt.title("average auto mutual information plot")
-    plt.savefig("./wholes/" + name + "_ami_summary")
+    #average_amis = np.zeros(len(ami)) #should be 1500
+    #for ami in amis:
+    #    for idx, member in enumerate(ami):
+    #        average_amis[idx] += member
+    #average_amis = np.divide(average_amis, len(amis))
+    #plt.plot(average_amis)
+    #plt.ylabel("auto mutual information (bits)")
+    #plt.xlabel("offset")
+    #plt.title("average auto mutual information plot")
+    #plt.savefig("./wholes/" + name + "_ami_summary")
 
 def total_cmis(wests, norths):
-    plt.close()
     cmis = []
     stepsize = 2
     stepmax = 50
     for west, north in zip(wests, norths):
         cmi = cross_mutual_information(west, north, stepsize, stepmax)
         #get freqs and cxy, must plot according to those
-        plt.plot(cmi, color="blue", alpha=0.1)
+        #plt.plot(cmi, color="blue", alpha=0.1)
         cmis.append(cmi)
-    plt.ylabel("cross mutual information (bits)")
-    plt.xlabel("offset")
-    plt.title("simultaneous cross mutual information plot")
-    plt.savefig("./wholes/cmi_mc")
+    #1, 50, 100
+    snapshot_1 = map(operator.itemgetter(0), cmis)
+    snapshot_1 = filter(lambda x: not math.isnan(x), snapshot_1)
+    print snapshot_1
     plt.close()
-    average_cmis = np.zeros(len(cmi)) #should be 1500
-    for cmi in cmis:
-        for idx, member in enumerate(cmi):
-            average_cmis[idx] += member
-    average_cmis = np.divide(average_cmis, len(cmis))
-    plt.plot(average_cmis)
-    plt.ylabel("cross mutual information (bits)")
-    plt.xlabel("offset")
-    plt.title("average cross mutual information plot")
-    plt.savefig("./wholes/cmi_summary")
+    plt.hist(snapshot_1)
+    plt.tight_layout()
+    plt.savefig("./wholes/cmi_snapshot")
+    #plt.ylabel("cross mutual information (bits)")
+    #plt.xlabel("offset")
+    #plt.title("simultaneous cross mutual information plot")
+    #plt.savefig("./wholes/cmi_mc")
+    #plt.close()
+    #average_cmis = np.zeros(len(cmi)) #should be 1500
+    #for cmi in cmis:
+    #    for idx, member in enumerate(cmi):
+    #        average_cmis[idx] += member
+    #average_cmis = np.divide(average_cmis, len(cmis))
+    #plt.plot(average_cmis)
+    #plt.ylabel("cross mutual information (bits)")
+    #plt.xlabel("offset")
+    #plt.title("average cross mutual information plot")
+    #plt.savefig("./wholes/cmi_summary")
 
 def hilbert_phase(data):
     #data to phase, clean and spiffy
@@ -202,7 +209,9 @@ def total_gammas(wests, norths):
     coherences = []
     for west, north in zip(wests, norths):
         coherences.append(mean_phase_coherence(hilbert_phase(west), hilbert_phase(north)))
+    plt.close()
     plt.hist(coherences)
+    plt.tight_layout()
     plt.xlabel("gamma")
     plt.ylabel("value")
     plt.savefig("total_gammas")
@@ -271,6 +280,7 @@ def hilbert_phase_diffs(wests, norths):
             average_diffs[idx] += member
     average_diffs = np.divide(average_diffs, len(diffs))
     plt.plot(average_diffs)
+    plt.tight_layout()
     plt.ylabel("analytic signal difference")
     plt.xlabel("phase")
     plt.title("average hilbert phase difference")
@@ -296,7 +306,8 @@ def whole_series(globs):
 
     #correlations_over_time(wests, norths)
     #coherences_over_time(wests, norths)
-    hilbert_phase_diffs(wests, norths)
+    #hilbert_phase_diffs(wests, norths)
+    #total_cmis(norths, wests)
     #total_amis(wests, "wests")
     #total_amis(norths, "norths")
     #total_gammas(wests, norths)

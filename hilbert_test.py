@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.signal as sci_sig
 import matplotlib.pyplot as plt
+import matplotlib
 import math
 import operator as op
 import plots
@@ -40,15 +41,17 @@ def total_cmis(west, north, name, num_points=10):
 
 def hilbert_transform_phase_diff(west, north, name):
     #phase diff modulus
+    font = {"size": 20}
+    matplotlib.rc('font', **font)
     plt.close()
     plt.clf()
     hilbert_w_phase = hilbert_phase(west)
     hilbert_n_phase = hilbert_phase(north)
     diff = np.exp(1j * (hilbert_w_phase - hilbert_n_phase))
-    plt.title(name)
     plt.xlabel("time")
     plt.plot(diff)
     plt.ylabel("phase diff(w - n)")
+    plt.tight_layout()
     plt.savefig("./phase_diff/" + name)
 
 def hilbert_phase_diff_csv(west, north, name):
