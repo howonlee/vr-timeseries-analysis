@@ -193,7 +193,9 @@ def processed_glob_series(part_reader, curr_fname):
 
     #block_phase_coherence(hilbert_phase(west), hilbert_phase(north), name=curr_fname)
     #hilbert_phase_diff_csv(west, north, name=curr_fname)
-    hilbert_transform_phase_diff(west, north, name=curr_fname)
+    double_poincare(west, north, name=curr_fname)
+    difference_poincare(west, north, name=curr_fname+"_diff")
+    #hilbert_transform_phase_diff(west, north, name=curr_fname)
 
 def filter_nan(member):
     if math.isnan(member):

@@ -8,6 +8,7 @@ import operator
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.mlab as mat_mlab
+import matplotlib
 import numpy.fft as np_f
 import numpy.linalg as np_l
 import numpy as np
@@ -70,6 +71,8 @@ def poincare_plot(data, order=1, name="", line=False, sds=False):
     also called a return map
     """
     plt.clf()
+    font = {"size": 22}
+    matplotlib.rc("font", **font)
     unlagged = data[:-order]
     lagged = np.roll(data, -order)[:-order]
     fig, ax = plt.subplots()
@@ -85,8 +88,8 @@ def poincare_plot(data, order=1, name="", line=False, sds=False):
         ax.scatter(unlagged, lagged, s=5)
     plt.xlabel("unlagged")
     plt.ylabel("lagged")
-    plt.title(name)
-    plt.show()
+    plt.tight_layout()
+    plt.savefig("./poincare_plots/" + name)
 
 #returns pkrojection of vector u onto the line defined by vector v
 def proj(u, v):
@@ -145,7 +148,9 @@ def ellipse_sds(data, order=1):
 
 
 def double_poincare(west, north, name, order=1):
-    plt.clf()
+    plt.close()
+    font = {"size": 22}
+    matplotlib.rc("font", **font)
     unlagged_w = west[:-order]
     lagged_w = np.roll(west, -order)[:-order]
     unlagged_n = north[:-order]
@@ -153,14 +158,16 @@ def double_poincare(west, north, name, order=1):
     plt.figure()
     plt.scatter(unlagged_w, lagged_w, color="blue", s=3, alpha=0.2)
     plt.scatter(unlagged_n, lagged_n, color="green", s=3, alpha=0.2)
+    plt.tight_layout()
     plt.xlabel("unlagged")
     plt.ylabel("lagged")
-    plt.title(name)
     plt.savefig("./poincare_plots/" + name)
 
 
 def difference_poincare(west, north, name, order=1):
     plt.clf()
+    font = {"size": 22}
+    matplotlib.rc("font", **font)
     west = np.array(west)
     north = np.array(north)
     dts = (west - north)
@@ -171,8 +178,8 @@ def difference_poincare(west, north, name, order=1):
     #always want to alpha
     plt.xlabel("unlagged")
     plt.ylabel("lagged")
-    plt.title(name)
-    plt.savefig("./difference_poincares/" + name)
+    plt.tight_layout()
+    plt.savefig("./poincare_plots/" + name)
 
 def difference_poincare_ellipse(west, north, name, order=1):
     plt.clf()
